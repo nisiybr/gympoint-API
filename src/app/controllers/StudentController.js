@@ -1,10 +1,9 @@
 import * as Yup from 'yup';
-import Student from '../models/Students';
-import Students from '../models/Students';
+import Student from '../models/Student';
 
 class StudentController {
   async index(req, res) {
-    const students = await Students.findAll();
+    const students = await Student.findAll();
     return res.json(students);
   }
 
@@ -25,7 +24,9 @@ class StudentController {
       return res.status(400).json({ error: 'Validation failed' });
     }
 
-    const student = await Student.findOne({ where: { email: req.body.email } });
+    const student = await Student.findOne({
+      where: { email: req.body.email },
+    });
 
     if (student) {
       return res.status(401).json({ error: 'Student already exists' });
@@ -59,7 +60,9 @@ class StudentController {
       return res.status(400).json({ error: 'Validation failed' });
     }
 
-    const student = await Student.findOne({ where: { email: req.body.email } });
+    const student = await Student.findOne({
+      where: { email: req.body.email },
+    });
 
     if (!student) {
       return res.status(401).json({ error: 'Student does not exist' });
