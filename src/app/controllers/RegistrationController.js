@@ -7,6 +7,30 @@ import Registration from '../models/Registration';
 import Mail from '../../lib/Mail';
 
 class RegistrationController {
+  async index(req, res) {
+    const registrations = await Registration.findAll({
+      include: [
+        {
+          model: Student,
+          as: 'Student',
+          attributes: [['name', 'student_name']],
+        },
+        {
+          model: Plan,
+          as: 'Plan',
+          attributes: [
+            ['title', 'title'],
+            ['duration', 'duration'],
+            ['price', 'month_price'],
+          ],
+        },
+      ],
+      order: ['id'],
+    });
+
+    return res.json(registrations);
+  }
+
   async store(req, res) {
     const { student_id, plan_id, start_date } = req.body; // pega variaveis do body
 
@@ -45,6 +69,55 @@ class RegistrationController {
     });
 
     return res.json(registration);
+  }
+
+  async update(req, res) {
+    const registration = await Registration.findByPk(req.params.id, {
+      include: [
+        {
+          model: Plan,
+          as: 'Plan',
+          attributes: ['duration'],
+        },
+      ],
+    });
+
+    if (!registration) {
+      return res.status(400).json({ error: 'Matricula não existe' });
+    }
+
+    const { start_date, plan_id } = req.body;
+    const plan = await Plan.findByPk(plan_id); // busca dados do plano
+    const convertedStartDate = startOfDay(parseISO(start_date));
+
+    if (plan && convertedStartDate) {
+      const result = await registration.update({
+        plan_id,
+        start_date: convertedStartDate,
+        end_date: addMonths(convertedStartDate, plan.duration),
+      });
+      return res.json(result);
+    }
+    if (!plan && convertedStartDate) {
+      const result = await registration.update({
+        start_date: convertedStartDate,
+        end_date: addMonths(convertedStartDate, registration.Plan.duration),
+      });
+
+      return res.json(result);
+    }
+    return res.json({ error: 'A start date is necessary' });
+  }
+
+  async delete(req, res) {
+    const registration = await Registration.findByPk(req.params.id);
+
+    if (!registration) {
+      return res.status(400).json({ error: 'Matricula não existe' });
+    }
+    await registration.destroy();
+
+    return res.json();
   }
 }
 export default new RegistrationController();
