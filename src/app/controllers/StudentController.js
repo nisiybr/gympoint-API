@@ -1,9 +1,23 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 import Student from '../models/Student';
 
 class StudentController {
   async index(req, res) {
-    const students = await Student.findAll();
+    const { q } = req.query;
+    if (!q) {
+      const filter = {};
+      const students = await Student.findAll(filter);
+      return res.json(students);
+    }
+    const filter = {
+      where: {
+        name: {
+          [Op.substring]: q,
+        },
+      },
+    };
+    const students = await Student.findAll(filter);
     return res.json(students);
   }
 
