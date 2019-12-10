@@ -1,4 +1,4 @@
-import { startOfDay, addMonths, parseISO, format } from 'date-fns';
+import { addDays, addMonths, parseISO, format } from 'date-fns';
 import pt from 'date-fns/locale/pt';
 import Plan from '../models/Plan';
 import Student from '../models/Student';
@@ -34,13 +34,12 @@ class RegistrationController {
 
   async store(req, res) {
     const { student_id, plan_id, start_date } = req.body; // pega variaveis do body
-
     const student = await Student.findByPk(student_id);
     const student_first_name = student.name.split(' ', 1);
     const plan = await Plan.findByPk(plan_id); // busca dados do plano
 
-    const start_date_conv = startOfDay(parseISO(start_date)); // converte e trunca data de inicio
-    const end_date = addMonths(start_date_conv, plan.duration); // calcula a data de fim de acordo com o plano
+    const start_date_conv = parseISO(start_date); // converte e trunca data de inicio
+    const end_date = addDays(addMonths(start_date_conv, plan.duration), -1); // calcula a data de fim de acordo com o plano
 
     const registration = await Registration.create({
       student_id,
@@ -89,7 +88,7 @@ class RegistrationController {
 
     const { start_date, plan_id } = req.body;
     const plan = await Plan.findByPk(plan_id); // busca dados do plano
-    const convertedStartDate = startOfDay(parseISO(start_date));
+    const convertedStartDate = parseISO(start_date);
 
     if (plan && convertedStartDate) {
       const result = await registration.update({
@@ -102,7 +101,10 @@ class RegistrationController {
     if (!plan && convertedStartDate) {
       const result = await registration.update({
         start_date: convertedStartDate,
-        end_date: addMonths(convertedStartDate, registration.Plan.duration),
+        end_date: addDays(
+          addMonths(convertedStartDate, registration.Plan.duration),
+          -1
+        ),
       });
 
       return res.json(result);
