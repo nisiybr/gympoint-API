@@ -13,7 +13,7 @@ class CheckinController {
       where: {
         student_id: req.params.id,
       },
-      order: ['created_at'],
+      order: [['created_at', 'DESC']],
     });
 
     return res.json(checkins);

@@ -25,7 +25,7 @@ class GymHelpOrderController {
     return res.json(help_order);
   }
 
-  async store(req, res) {
+  async update(req, res) {
     const { id } = req.params;
     const { answer } = req.body;
 
