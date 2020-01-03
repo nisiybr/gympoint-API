@@ -6,7 +6,7 @@ class StudentController {
   async index(req, res) {
     const { q } = req.query;
     if (!q) {
-      const filter = {};
+      const filter = { order: [['id', 'ASC']] };
       const students = await Student.findAll(filter);
       return res.json(students);
     }
@@ -16,6 +16,7 @@ class StudentController {
           [Op.substring]: q,
         },
       },
+      order: [['id', 'ASC']],
     };
     const students = await Student.findAll(filter);
     return res.json(students);
