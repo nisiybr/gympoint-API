@@ -9,25 +9,25 @@ module.exports = {
       },
       student_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
           // adiciona como foreign key
           model: 'students', // nome da tabela referenciada
           key: 'id', // campo da tabela referenciada
           onUpdate: 'CASCADE',
-          onDelete: 'SET NULL',
+          onDelete: 'CASCADE',
           allowNull: true,
         },
       },
       plan_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
           // adiciona como foreign key
           model: 'plans', // nome da tabela referenciada
           key: 'id', // campo da tabela referenciada
           onUpdate: 'CASCADE',
-          onDelete: 'SET NULL',
+          onDelete: 'CASCADE',
           allowNull: true,
         },
       },

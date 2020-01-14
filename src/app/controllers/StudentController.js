@@ -44,7 +44,9 @@ class StudentController {
     });
 
     if (student) {
-      return res.status(401).json({ error: 'Student already exists' });
+      return res
+        .status(400)
+        .json({ error: 'O endereço de e-mail já está sendo utilizado' });
     }
 
     const { name, email, age, weight, height } = await Student.create(req.body);
@@ -99,9 +101,14 @@ class StudentController {
     if (!student) {
       return res.status(400).json({ error: 'Aluno não existe' });
     }
-    await student.destroy();
-
-    return res.json();
+    try {
+      await student.destroy();
+      return res.json();
+    } catch (err) {
+      return res
+        .status(400)
+        .json({ error: 'Não foi possível excluir o aluno' });
+    }
   }
 }
 export default new StudentController();
